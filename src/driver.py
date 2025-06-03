@@ -27,14 +27,12 @@ def get_data(year: int, quarter: str):
     print(data)
 
 def main() -> None:
-    #Step 1: Data collection
-    data = []
+    #Step 1: Automatically identify and retrieve full transcripts of NVIDIA’s earnings calls for the last four quarters.
+    transcripts = []
     for q in QUARTERS:
         year = q["year"]
         quarter = q["quarter"]
-        # data.append(get_data(year, quarter))
-        print(get_data(year, quarter))
-        break
+        transcripts.append(get_data(year, quarter))
     
     #Step 2: Signal extraction
     
