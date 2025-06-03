@@ -45,7 +45,12 @@ def get_recent_nvda_quarters(n: int = 4) -> list[dict]:
 STOCK_API_KEY = os.getenv("STOCK_API_KEY", "")
 STOCK_END_POINT = "https://www.alphavantage.co/query"
 SYMBOL = "NVDA"
-QUARTERS = get_recent_nvda_quarters()
+QUARTERS = [
+    {"year": 2026, "quarter": "Q1"},  # ended April 27, 2025
+    {"year": 2025, "quarter": "Q4"},  # ended January 26, 2025
+    {"year": 2025, "quarter": "Q3"},  # ended October 27, 2024
+    {"year": 2025, "quarter": "Q2"},  # ended July 28, 2024
+] # get_recent_nvda_quarters()
 
 # Download NLTK data
 nltk.download('punkt_tab')
@@ -95,7 +100,13 @@ def extract_themes(transcript: list[dict], top_n: int = 5) -> list[str]:
     keywords = [
         "AI", "artificial intelligence", "data center", "growth", "revenue",
         "innovation", "technology", "GPU", "cloud", "partnerships",
-        "Blackwell", "Hopper", "Sovereign AI", "inference", "training"
+        "Blackwell", "Hopper", "Sovereign AI", "inference", "training", "CUDA",
+        "RTX", "DLSS", "Omniverse", "edge computing", "AI chips", "deep learning",
+        "neural networks", "accelerator", "chips", "semiconductors", "autonomous vehicles",
+        "gaming", "metaverse", "GPU architecture", "Ray tracing","Tensor cores", "NVLink",
+        "DGX systems", "robotics", "AI supercomputer", "H100", "A100", "Jetson", "shield",
+        "virtual reality", "smart NIC", "NVIDIA AI Enterprise", "Maxine", "climate modeling",
+        "AI inference", "AI training", "partnerships", "chip design", "supply chain", "silicon",
     ]
     text = " ".join(segment["content"] for segment in transcript).lower()
     words = re.findall(r'\b\w+\b', text)
@@ -128,13 +139,13 @@ def main() -> None:
 
         prepared, qna = extract_sections(segments)
 
-        # Management Sentiment
+        # Management Sentiment: Overall sentiment (positive/neutral/negative) of prepared remarks by executives.
         management_sentiment = analyze_sentiment(prepared, sentiment_analyzer)
 
-        # Q&A Sentiment
+        # Q&A Sentiment: Overall tone and sentiment during the Q&A portion.
         qna_sentiment = analyze_sentiment(qna, sentiment_analyzer)
 
-        # Strategic Focuses
+        #  Strategic Focuses: Extract 3-5 key themes or initiatives emphasized each quarter (e.g., AI growth, data center expansion).
         themes = extract_themes(segments)
 
         results.append({
@@ -145,7 +156,7 @@ def main() -> None:
             "themes": themes
         })
 
-    # Quarter-over-Quarter Tone Change
+    #  Quarter-over-Quarter Tone Change: Analyze and compare sentiment/tone shifts across the four quarters.
     print("\nQuarterly Analysis:")
     for i, result in enumerate(results):
         print(f"\n{result['year']} {result['quarter']}:")
@@ -163,23 +174,6 @@ def main() -> None:
             print(f"    Management: {'More positive' if mgmt_score_diff > 0 else 'More negative' if mgmt_score_diff < 0 else 'Stable'} ({mgmt_score_diff:.2f})")
             print(f"    Q&A: {'More positive' if qna_score_diff > 0 else 'More negative' if qna_score_diff < 0 else 'Stable'} ({qna_score_diff:.2f})")
 
-    
-    """
-    Implement logic (preferably AI-powered) to extract the following from each transcript:
-    Management Sentiment: Overall sentiment (positive/neutral/negative) of prepared remarks by executives.
-
-
-    Q&A Sentiment: Overall tone and sentiment during the Q&A portion.
-
-
-    Quarter-over-Quarter Tone Change: Analyze and compare sentiment/tone shifts across the four quarters.
-
-
-    Strategic Focuses: Extract 3-5 key themes or initiatives emphasized each quarter (e.g., AI growth, data center expansion).
-
-    """
-    
-    
     
     #Step 3: User Interface
     
