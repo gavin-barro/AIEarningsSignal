@@ -70,12 +70,11 @@ QUARTERS = [
     {"year": 2024, "quarter": "Q4"},  # ended January 28, 2024
     {"year": 2024, "quarter": "Q3"},  # ended October 29, 2023
     {"year": 2024, "quarter": "Q2"},  # ended July 30, 2023
-]
- # get_recent_nvda_quarters()
+] 
+# get_recent_nvda_quarters()
 
 # Download NLTK data
 nltk.download('punkt_tab')
-
 
 def get_data(year: int, quarter: str) -> dict:
     """
@@ -103,7 +102,6 @@ def get_data(year: int, quarter: str) -> dict:
     data = response.json()
     return data
 
-
 def extract_sections(transcript: list[dict]) -> tuple[str, str]:
     """
     Extracts and separates the prepared remarks and Q&A sections from an earnings call transcript.
@@ -129,16 +127,11 @@ def extract_sections(transcript: list[dict]) -> tuple[str, str]:
         speaker_title = segment["title"].lower()
         content = segment["content"]
 
-        # Detect start of Q&A based on analyst or operator introducing questions
-        # This heuristic assumes Q&A starts once an "analyst" speaks or "operator" mentions "question" for the first time.
-        if speaker_title == "analyst" or (speaker_title == "operator" and "question" in content.lower()):
-            in_qna = True
-        
-        if in_qna:
-            qna_section.append(content)
-        # Only include CEO/CFO for prepared remarks before Q&A begins
-        elif speaker_title in ["ceo", "cfo"]:
+        if speaker_title in ["ceo", "cfo"]:
             prepared_remarks.append(content)
+        
+        if speaker_title == "analyst" or speaker_title in ["ceo", "cfo"]:
+            qna_section.append(content)
             
     return " ".join(prepared_remarks), " ".join(qna_section)
 
@@ -146,14 +139,11 @@ def analyze_sentiment(text: str, sentiment_analyzer) -> dict:
     """
     Analyzes the sentiment of a given text using a pre-trained sentiment analyzer.
 
-    The sentiment score is calculated as the average positive score minus the average negative score.
-    The label is determined based on predefined thresholds.
-
     Args:
         text (str): The input text to analyze.
         sentiment_analyzer: A callable sentiment analysis model (e.g., from Hugging Face pipelines)
                             that takes a list of sentences and returns a list of sentiment results
-                            with 'label' (e.g., "POSITIVE", "NEGATIVE", "NEUTRAL") and 'score'.
+                            with 'label' (e.g., "POSITIVE", "NEUTRAL", "NEGATIVE") and 'score'.
 
     Returns:
         dict: A dictionary containing the sentiment 'label' and 'score'.
@@ -165,26 +155,35 @@ def analyze_sentiment(text: str, sentiment_analyzer) -> dict:
     # Tokenize the text into sentences for better granular analysis
     sentences = sent_tokenize(text)
     
-    # Perform sentiment analysis on the sentences.
-    # truncation=True and max_length=512 are common parameters for transformer models
-    # to handle long inputs.
+    # Perform sentiment analysis on the sentences
     results = sentiment_analyzer(sentences, truncation=True, max_length=512)
     
-    # Extract scores for positive and negative sentiments
-    positive_scores = [r["score"] for r in results if r["label"] == "POSITIVE"]
-    negative_scores = [r["score"] for r in results if r["label"] == "NEGATIVE"]
+    # Count occurrences of each label and average scores
+    labels = [r["label"] for r in results]
+    scores = [r["score"] for r in results]
     
-    # Calculate the average score for positive and negative sentiments
-    avg_positive_score = sum(positive_scores) / len(positive_scores) if positive_scores else 0
-    avg_negative_score = sum(negative_scores) / len(negative_scores) if negative_scores else 0
+    # Map labels to standard form
+    label_map = {"NEG": "NEGATIVE", "NEU": "NEUTRAL", "POS": "POSITIVE"}
+    mapped_labels = [label_map.get(label, label) for label in labels]
     
-    # Calculate the overall sentiment score (positive average - negative average)
-    avg_score = avg_positive_score - avg_negative_score
+    # Calculate average score per label
+    positive_scores = [s for s, l in zip(scores, mapped_labels) if l == "POSITIVE"]
+    negative_scores = [s for s, l in zip(scores, mapped_labels) if l == "NEGATIVE"]
+    neutral_scores = [s for s, l in zip(scores, mapped_labels) if l == "NEUTRAL"]
     
-    # Determine the sentiment label based on thresholds
-    label = "POSITIVE" if avg_score > 0.1 else "NEGATIVE" if avg_score < -0.1 else "NEUTRAL"
+    avg_positive = sum(positive_scores) / len(positive_scores) if positive_scores else 0
+    avg_negative = sum(negative_scores) / len(negative_scores) if negative_scores else 0
+    avg_neutral = sum(neutral_scores) / len(neutral_scores) if neutral_scores else 0
     
-    return {"label": label, "score": avg_score}
+    # Determine dominant label by frequency and average score
+    label_counts = {"POSITIVE": len(positive_scores), "NEUTRAL": len(neutral_scores), "NEGATIVE": len(negative_scores)}
+    max_count = max(label_counts.values())
+    dominant_label = max(label_counts, key=lambda k: (label_counts[k], {"POSITIVE": avg_positive, "NEUTRAL": avg_neutral, "NEGATIVE": avg_negative}[k]))
+    
+    # Use the average score of the dominant label
+    score = {"POSITIVE": avg_positive, "NEUTRAL": avg_neutral, "NEGATIVE": avg_negative}[dominant_label]
+    
+    return {"label": dominant_label, "score": score}
 
 def extract_themes(transcript: list[dict], top_n: int = 5) -> list[str]:
     """
@@ -225,17 +224,16 @@ def extract_themes(transcript: list[dict], top_n: int = 5) -> list[str]:
     word_counts = Counter(words)
     
     # Filter keywords that are present in the transcript and appear more than twice
-    # This helps to focus on more significant themes.
     themes = [word for word in keywords if word in word_counts and word_counts[word] > 2]
     
     # Return only the top N themes
     return themes[:top_n]
 
 def main() -> None:
-    # Initialize sentiment analyzer
-    sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+    # Initialize sentiment analyzer with a model that supports neutral sentiment
+    sentiment_analyzer = pipeline("sentiment-analysis", model="finiteautomata/bertweet-base-sentiment-analysis")
     
-    #Step 1: Automatically identify and retrieve full transcripts of NVIDIA’s earnings calls for the last four quarters.
+    # Step 1: Automatically identify and retrieve full transcripts of NVIDIA’s earnings calls for the last four quarters.
     transcripts = []
     for q in QUARTERS:
         year = q["year"]
@@ -254,15 +252,15 @@ def main() -> None:
             print(f"Warning: No transcript data for {year} {quarter}")
             continue
 
-        prepared, qna = extract_sections(segments)
+        executives, qna = extract_sections(segments)
 
         # Management Sentiment: Overall sentiment (positive/neutral/negative) of prepared remarks by executives.
-        management_sentiment = analyze_sentiment(prepared, sentiment_analyzer)
+        management_sentiment = analyze_sentiment(executives, sentiment_analyzer)
 
         # Q&A Sentiment: Overall tone and sentiment during the Q&A portion.
         qna_sentiment = analyze_sentiment(qna, sentiment_analyzer)
 
-        #  Strategic Focuses: Extract 3-5 key themes or initiatives emphasized each quarter (e.g., AI growth, data center expansion).
+        # Strategic Focuses: Extract 3-5 key themes or initiatives emphasized each quarter (e.g., AI growth, data center expansion).
         themes = extract_themes(segments)
 
         results.append({
@@ -273,7 +271,7 @@ def main() -> None:
             "themes": themes
         })
 
-    #  Quarter-over-Quarter Tone Change: Analyze and compare sentiment/tone shifts across the four quarters.
+    # Quarter-over-Quarter Tone Change: Analyze and compare sentiment/tone shifts across the four quarters.
     print("\nQuarterly Analysis:")
     for i, result in enumerate(results):
         print(f"\n{result['year']} {result['quarter']}:")
