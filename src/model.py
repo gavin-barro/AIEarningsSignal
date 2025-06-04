@@ -289,13 +289,5 @@ def main() -> None:
             print(f"    Management: {'More positive' if mgmt_score_diff > 0 else 'More negative' if mgmt_score_diff < 0 else 'Stable'} ({mgmt_score_diff:.2f})")
             print(f"    Q&A: {'More positive' if qna_score_diff > 0 else 'More negative' if qna_score_diff < 0 else 'Stable'} ({qna_score_diff:.2f})")
 
-    
-    #Step 3: User Interface
-    
-    # Done using flask^
-    
-    
-    #Step 4: Deploy
-
 if __name__ == "__main__":
     main()
