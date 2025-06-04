@@ -66,11 +66,12 @@ STOCK_API_KEY = os.getenv("STOCK_API_KEY", "")
 STOCK_END_POINT = "https://www.alphavantage.co/query"
 SYMBOL = "NVDA"
 QUARTERS = [
-    {"year": 2026, "quarter": "Q1"},  # ended April 27, 2025
-    {"year": 2025, "quarter": "Q4"},  # ended January 26, 2025
-    {"year": 2025, "quarter": "Q3"},  # ended October 27, 2024
-    {"year": 2025, "quarter": "Q2"},  # ended July 28, 2024
-] # get_recent_nvda_quarters()
+    {"year": 2025, "quarter": "Q1"},  # ended April 28, 2024
+    {"year": 2024, "quarter": "Q4"},  # ended January 28, 2024
+    {"year": 2024, "quarter": "Q3"},  # ended October 29, 2023
+    {"year": 2024, "quarter": "Q2"},  # ended July 30, 2023
+]
+ # get_recent_nvda_quarters()
 
 # Download NLTK data
 nltk.download('punkt_tab')
