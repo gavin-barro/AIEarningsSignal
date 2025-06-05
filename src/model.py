@@ -302,5 +302,5 @@ def main() -> None:
             print_score_diff("Management", mgmt_score_diff)
             print_score_diff("Q&A", qna_score_diff)
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

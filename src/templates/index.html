@@ -17,7 +17,10 @@
                     <th>Year</th>
                     <th>Quarter</th>
                     <th>Management Sentiment</th>
-                    <th>Score</th>
+                    <th>Management Score</th>
+                    <th>Q&amp;A Sentiment</th>
+                    <th>Q&amp;A Score</th>
+                    <th>Themes</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,8 +28,11 @@
                 <tr>
                     <td>{{ quarter.year }}</td>
                     <td>{{ quarter.quarter }}</td>
-                    <td>{{ quarter.management_sentiment }}</td>
-                    <td>{{ "%.2f"|format(quarter.score) }}</td>
+                    <td>{{ quarter.management_sentiment.label }}</td>
+                    <td>{{ "%.2f"|format(quarter.management_sentiment.score) }}</td>
+                    <td>{{ quarter.qna_sentiment.label }}</td>
+                    <td>{{ "%.2f"|format(quarter.qna_sentiment.score) }}</td>
+                    <td>{{ quarter.themes|join(", ") }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -35,36 +41,14 @@
         <!-- Chart -->
         <h2>Sentiment Score Over Time</h2>
         <canvas id="sentimentChart" width="600" height="300"></canvas>
+
+        <!-- Data passed to chart.js -->
+        <script id="labels-data" type="application/json">{{ labels | tojson }}</script>
+        <script id="management-scores-data" type="application/json">{{ management_scores | tojson }}</script>
+        <script id="qna-scores-data" type="application/json">{{ qna_scores | tojson }}</script>
+
+        <!-- External JS -->
+        <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
     </div>
-
-    <script>
-        const labels = {{ labels | tojson }};
-        const scores = {{ scores | tojson }};
-
-        const ctx = document.getElementById('sentimentChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Management Sentiment Score',
-                    data: scores,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.2,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 1
-                    }
-                }
-            }
-        });
-    </script>
 </body>
 </html>

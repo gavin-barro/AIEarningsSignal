@@ -7,16 +7,47 @@ app = Flask(__name__)
 def index():
     # Switch to ndva_analysis() when the visuals are done
     ndva_quarters = [
-        {"year": 2025, "quarter": "Q1", "management_sentiment": "Positive", "score": 0.85},
-        {"year": 2024, "quarter": "Q4", "management_sentiment": "Neutral", "score": 0.5},
-        {"year": 2024, "quarter": "Q3", "management_sentiment": "Neutral", "score": 0.4},
-        {"year": 2024, "quarter": "Q2", "management_sentiment": "Negative", "score": 0.2},
-    ]
+    {
+        "year": "2025",
+        "quarter": "Q1",
+        "management_sentiment": {"label": "POSITIVE", "score": 0.87},
+        "qna_sentiment": {"label": "NEUTRAL", "score": 0.45},
+        "themes": ["AI growth", "data center expansion", "gaming market"]
+    },
+    {
+        "year": "2024",
+        "quarter": "Q4",
+        "management_sentiment": {"label": "NEUTRAL", "score": 0.52},
+        "qna_sentiment": {"label": "NEGATIVE", "score": 0.28},
+        "themes": ["supply chain", "AI integration", "automotive AI"]
+    },
+    {
+        "year": "2024",
+        "quarter": "Q3",
+        "management_sentiment": {"label": "NEGATIVE", "score": 0.30},
+        "qna_sentiment": {"label": "NEGATIVE", "score": 0.20},
+        "themes": ["China regulations", "inventory", "operational costs"]
+    },
+    {
+        "year": "2024",
+        "quarter": "Q2",
+        "management_sentiment": {"label": "POSITIVE", "score": 0.76},
+        "qna_sentiment": {"label": "POSITIVE", "score": 0.67},
+        "themes": ["Hopper GPUs", "enterprise demand", "cloud partnerships"]
+    }
+]
 
-    labels = [f"{q['year']} {q['quarter']}" for q in ndva_quarters]
-    scores = [q['score'] for q in ndva_quarters]
+    # Prepare data
+    labels = [f"{r['year']} {r['quarter']}" for r in ndva_quarters]
+    management_scores = [r["management_sentiment"]["score"] for r in ndva_quarters]
+    qna_scores = [r["qna_sentiment"]["score"] for r in ndva_quarters]
+    
+    return render_template('index.html', quarters=ndva_quarters, labels=labels, 
+                           management_scores=management_scores, qna_scores=qna_scores)
 
-    return render_template('index.html', quarters=ndva_quarters, labels=labels, scores=scores)
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
+    
+    
