@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Get data from the script tags
-    let labels = JSON.parse(document.getElementById('labels-data').textContent);
-    let managementScores = JSON.parse(document.getElementById('management-scores-data').textContent);
-    let qnaScores = JSON.parse(document.getElementById('qna-scores-data').textContent);
+    const labels = JSON.parse(document.getElementById('labels-data').textContent);
+    const managementScores = JSON.parse(document.getElementById('management-scores-data').textContent);
+    const qnaScores = JSON.parse(document.getElementById('qna-scores-data').textContent);
 
     // Get the canvas context
     let ctx = document.getElementById('sentimentChart').getContext('2d');
