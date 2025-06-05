@@ -130,7 +130,7 @@ def extract_sections(transcript: list[dict]) -> tuple[str, str]:
         if speaker_title in ["ceo", "cfo"]:
             prepared_remarks.append(content)
         
-        if speaker_title == "analyst" or speaker_title in ["ceo", "cfo"]:
+        if speaker_title == "analyst" or speaker_title == "operator" or speaker_title in ["ceo", "cfo"]:
             qna_section.append(content)
             
     return " ".join(prepared_remarks), " ".join(qna_section)
@@ -229,7 +229,7 @@ def extract_themes(transcript: list[dict], top_n: int = 5) -> list[str]:
     # Return only the top N themes
     return themes[:top_n]
 
-def main() -> None:
+def ndva_analysis() -> list[dict]:
     # Initialize sentiment analyzer with a model that supports neutral sentiment
     sentiment_analyzer = pipeline("sentiment-analysis", model="finiteautomata/bertweet-base-sentiment-analysis")
     
@@ -271,6 +271,11 @@ def main() -> None:
             "themes": themes
         })
 
+    return results
+
+def main() -> None:
+    results = ndva_analysis()
+    
     # Quarter-over-Quarter Tone Change: Analyze and compare sentiment/tone shifts across the four quarters.
     print("\nQuarterly Analysis:")
     for i, result in enumerate(results):
