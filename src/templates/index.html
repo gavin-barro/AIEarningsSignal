@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8" />
     <title>NDVA Quarter Analysis</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='static/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>NVIDIA Quarter Sentiment Analysis</h1>
 
+        <!-- Table -->
         <table>
             <thead>
                 <tr>
@@ -29,6 +31,40 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- Chart -->
+        <h2>Sentiment Score Over Time</h2>
+        <canvas id="sentimentChart" width="600" height="300"></canvas>
     </div>
+
+    <script>
+        const labels = {{ labels | tojson }};
+        const scores = {{ scores | tojson }};
+
+        const ctx = document.getElementById('sentimentChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Management Sentiment Score',
+                    data: scores,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>

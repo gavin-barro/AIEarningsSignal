@@ -121,7 +121,6 @@ def extract_sections(transcript: list[dict]) -> tuple[str, str]:
     """
     prepared_remarks = []
     qna_section = []
-    in_qna = False
 
     for segment in transcript:
         speaker_title = segment["title"].lower()
@@ -130,8 +129,8 @@ def extract_sections(transcript: list[dict]) -> tuple[str, str]:
         if speaker_title in ["ceo", "cfo"]:
             prepared_remarks.append(content)
         
-        if speaker_title == "analyst" or speaker_title == "operator" or speaker_title in ["ceo", "cfo"]:
-            qna_section.append(content)
+        # if speaker_title == "analyst" or speaker_title == "operator" or speaker_title in ["ceo", "cfo"]:
+        qna_section.append(content)
             
     return " ".join(prepared_remarks), " ".join(qna_section)
 
@@ -273,6 +272,15 @@ def ndva_analysis() -> list[dict]:
 
     return results
 
+def print_score_diff(category: str, score_diff: float) -> None:
+    if score_diff == 0:
+        sentiment = "Stable"
+    elif score_diff > 0:
+        sentiment = "Slightly more positive" if score_diff < 0.1 else "More positive"
+    else:
+        sentiment = "Slightly more negative" if score_diff > -0.1 else "More negative"
+    print(f"    {category}: {sentiment} ({score_diff:.2f})")
+
 def main() -> None:
     results = ndva_analysis()
     
@@ -291,8 +299,8 @@ def main() -> None:
             qna_score_diff = result["qna_sentiment"]["score"] - prev["qna_sentiment"]["score"]
 
             print(f"  Tone Change (vs {prev['year']} {prev['quarter']}):")
-            print(f"    Management: {'More positive' if mgmt_score_diff > 0 else 'More negative' if mgmt_score_diff < 0 else 'Stable'} ({mgmt_score_diff:.2f})")
-            print(f"    Q&A: {'More positive' if qna_score_diff > 0 else 'More negative' if qna_score_diff < 0 else 'Stable'} ({qna_score_diff:.2f})")
+            print_score_diff("Management", mgmt_score_diff)
+            print_score_diff("Q&A", qna_score_diff)
 
 if __name__ == "__main__":
     main()
