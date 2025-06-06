@@ -25,6 +25,7 @@
             </thead>
             <tbody>
                 {% for quarter in quarters %}
+                <!-- Main Data Row -->
                 <tr>
                     <td>{{ quarter.year }}</td>
                     <td>{{ quarter.quarter }}</td>
@@ -32,7 +33,21 @@
                     <td>{{ "%.2f"|format(quarter.management_sentiment.score) }}</td>
                     <td>{{ quarter.qna_sentiment.label }}</td>
                     <td>{{ "%.2f"|format(quarter.qna_sentiment.score) }}</td>
-                    <td>{{ quarter.themes|join(", ") }}</td>
+                    <td>{{ quarter.themes | join(", ") }}</td>
+                </tr>
+
+                <!-- Transcript Row -->
+                <tr>
+                    <td colspan="7">
+                        <details>
+                            <summary><strong>View Transcript</strong></summary>
+                            <ul>
+                                {% for line in quarter.transcript %}
+                                <li>{{ line }}</li>
+                                {% endfor %}
+                            </ul>
+                        </details>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
