@@ -1,6 +1,7 @@
 import os
 import requests
 from datetime import datetime
+from typing import Any
 from dotenv import load_dotenv
 from transformers import pipeline
 import nltk
@@ -134,7 +135,7 @@ def extract_sections(transcript: list[dict]) -> tuple[str, str]:
             
     return " ".join(prepared_remarks), " ".join(qna_section)
 
-def analyze_sentiment(text: str, sentiment_analyzer) -> dict:
+def analyze_sentiment(text: str, sentiment_analyzer: Any) -> dict:
     """
     Analyzes the sentiment of a given text using a pre-trained sentiment analyzer.
 
