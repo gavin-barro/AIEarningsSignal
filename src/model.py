@@ -120,7 +120,7 @@ def extract_sections(transcript: list[dict]) -> tuple[str, str]:
                          - The concatenated text of the prepared remarks.
                          - The concatenated text of the Q&A section.
     """
-    prepared_remarks = []
+    speaker_remarks = []
     qna_section = []
 
     for segment in transcript:
@@ -128,12 +128,12 @@ def extract_sections(transcript: list[dict]) -> tuple[str, str]:
         content = segment["content"]
 
         if speaker_title in ["ceo", "cfo"]:
-            prepared_remarks.append(content)
+            speaker_remarks.append(content)
         
         # if speaker_title == "analyst" or speaker_title == "operator" or speaker_title in ["ceo", "cfo"]:
         qna_section.append(content)
             
-    return " ".join(prepared_remarks), " ".join(qna_section)
+    return " ".join(speaker_remarks), " ".join(qna_section)
 
 def analyze_sentiment(text: str, sentiment_analyzer: Any) -> dict:
     """
@@ -303,5 +303,5 @@ def main() -> None:
             print_score_diff("Management", mgmt_score_diff)
             print_score_diff("Q&A", qna_score_diff)
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
