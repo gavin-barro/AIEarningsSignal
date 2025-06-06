@@ -130,7 +130,6 @@ def extract_sections(transcript: list[dict]) -> tuple[str, str]:
         if speaker_title in ["ceo", "cfo"]:
             speaker_remarks.append(content)
         
-        # if speaker_title == "analyst" or speaker_title == "operator" or speaker_title in ["ceo", "cfo"]:
         qna_section.append(content)
             
     return " ".join(speaker_remarks), " ".join(qna_section)
@@ -252,6 +251,17 @@ def ndva_analysis() -> list[dict]:
             print(f"Warning: No transcript data for {year} {quarter}")
             continue
 
+        # Extract transcript segments without sentiment
+        transcript_segments = [
+            {
+                "speaker": segment.get("speaker", "Unknown"),
+                "title": segment.get("title", "Unknown"),
+                "content": segment.get("content", "")
+            }
+            for segment in segments if segment.get("content", "")
+        ]
+
+        # Extract prepared remarks and Q&A sections
         executives, qna = extract_sections(segments)
 
         # Management Sentiment: Overall sentiment (positive/neutral/negative) of prepared remarks by executives.
@@ -260,15 +270,17 @@ def ndva_analysis() -> list[dict]:
         # Q&A Sentiment: Overall tone and sentiment during the Q&A portion.
         qna_sentiment = analyze_sentiment(qna, sentiment_analyzer)
 
-        # Strategic Focuses: Extract 3-5 key themes or initiatives emphasized each quarter (e.g., AI growth, data center expansion).
+        # Strategic Focuses: Extract 3-5 key themes or initiatives emphasized each quarter.
         themes = extract_themes(segments)
 
+        # Append results with transcript segments
         results.append({
             "year": year,
             "quarter": quarter,
             "management_sentiment": management_sentiment,
             "qna_sentiment": qna_sentiment,
-            "themes": themes
+            "themes": themes,
+            "transcript": transcript_segments
         })
 
     return results
