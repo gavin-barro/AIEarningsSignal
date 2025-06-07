@@ -58,10 +58,13 @@
                         <details>
                             <summary><strong>View Transcript</strong></summary>
                             <ul>
-                                {% for line in quarter.transcript %}
-                                <li>{{ line }}</li>
+                                {% for entry in quarter.transcript %}
+                                <li>
+                                    <strong>{{ entry.speaker }}</strong> ({{ entry.title }}): {{ entry.content }}
+                                </li>
                                 {% endfor %}
                             </ul>
+
                         </details>
                     </td>
                 </tr>
