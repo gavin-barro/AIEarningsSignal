@@ -3,3 +3,4 @@ tempCodeRunnerFile.*
 info.txt
 __pycache__
 .vscode
+.DS*
