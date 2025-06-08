@@ -44,13 +44,6 @@ This web application analyzes quarterly earnings call transcripts from NVIDIA to
 - **Custom Theme Extraction**: Uses a curated set of NVIDIA-specific keywords and counts frequency across transcripts.
 - **Alpha Vantage API**: Supplies the earnings call transcript data.
 
-## ⚠️ Assumptions and Limitations
-- **Transcript Quality**: The analysis assumes well-structured transcripts from Alpha Vantage. Some quarters may be missing or malformed.
-- **Keyword-based Themes**: Strategic focus extraction relies on static keyword lists and simple frequency counts — not deep semantic modeling.
-- **Model Behavior**: The sentiment model used was trained on social media text, not corporate earnings calls. It performs reasonably well but may not capture nuances in financial language.
-- **Limited Quarters**: Currently restricted to analyzing the most recent 4 quarters.
-- **Hardcoded Fallback Data**: In absence of live API data, the frontend may use predefined mock data.
-
 ## 📁 File Overview
 ```
 .
