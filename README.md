@@ -47,12 +47,19 @@ This web application analyzes quarterly earnings call transcripts from NVIDIA to
 ## 📁 File Overview
 ```
 .
-├── app.py              # Flask app (frontend and routing)
-├── model.py            # All backend logic: API calls, NLP, and sentiment
-├── templates/
-│   └── index.html      # Main dashboard template
-├── static/
-│   └── css/style.css   # Optional styles
-├── .env                # Your Alpha Vantage key
-└── README.md           # You're here!
+├── .gitignore
+├── live_link.txt
+├── README.md
+├── src/
+│   ├── app.py
+│   ├── model.py
+│   ├── templates/
+│   │   └── index.html
+│   └── static/
+│       ├── css/
+│       │   └── style.css
+│       ├── img/
+│       └── js/
+│           └── script.js
+├── .env
 ```
