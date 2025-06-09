@@ -2,6 +2,9 @@
 
 This web application analyzes quarterly earnings call transcripts from NVIDIA to extract insights about management tone, Q&A sentiment, and strategic themes. It helps investors and analysts quickly assess the emotional tone and priorities of company leadership over recent fiscal quarters.
 
+## Author
+Gavin Barro
+
 ## 🌟 What the App Does
 - Fetches and processes NVIDIA’s earnings call transcripts (via Alpha Vantage).
 - Applies sentiment analysis on:
